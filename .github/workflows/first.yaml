@@ -1,0 +1,21 @@
+name: First Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: echo "Hello GitHub Actions"
+
+      - run: pwd
+
+      - run: ls -la
+
+      - run: hostname
+
+      - run: whoami
