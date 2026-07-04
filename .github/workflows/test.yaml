@@ -1,0 +1,21 @@
+name: Self Hosted Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: echo "Hello from Self Hosted Runner"
+
+      - run: hostname
+
+      - run: whoami
+
+      - run: pwd
+
+      - run: kubectl get nodes
