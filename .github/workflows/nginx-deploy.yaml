@@ -1,0 +1,32 @@
+name: Deploy to K3s
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Repository #download repo
+        uses: actions/checkout@v4
+
+      - name: Verify Runner
+        run: |
+          echo "Runner Name : $RUNNER_NAME"
+          hostname
+          whoami
+
+      - name: Check Kubernetes
+        run: |
+          kubectl get nodes
+
+      - name: Deploy Application
+        run: |
+          kubectl apply -f k8s/
+
+      - name: Verify Deployment
+        run: |
+          kubectl get deployments
+          kubectl get pods
+          kubectl get svc
