@@ -7,26 +7,65 @@ jobs:
   deploy:
     runs-on: self-hosted
 
+    timeout-minutes: 15
+
     steps:
-      - name: Checkout Repository #download repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Verify Runner
+      - name: Runner Information
         run: |
+          echo "===== RUNNER INFO ====="
           echo "Runner Name : $RUNNER_NAME"
+          echo "Runner OS   : $RUNNER_OS"
+          echo "Repository  : $GITHUB_REPOSITORY"
+          echo "Workspace   : $GITHUB_WORKSPACE"
           hostname
           whoami
+          pwd
 
-      - name: Check Kubernetes
+      - name: Verify Kubernetes Cluster
         run: |
+          echo "===== CLUSTER ====="
+          kubectl cluster-info
           kubectl get nodes
+
+      - name: Validate Kubernetes Manifests
+        run: |
+          echo "===== VALIDATION ====="
+          kubectl apply \
+            --dry-run=client \
+            -f k8s/
 
       - name: Deploy Application
         run: |
+          echo "===== DEPLOY ====="
           kubectl apply -f k8s/
 
-      - name: Verify Deployment
+      - name: Wait for Rollout
         run: |
-          kubectl get deployments
-          kubectl get pods
+          echo "===== WAIT ====="
+          kubectl rollout status deployment/nginx-demo --timeout=120s
+
+      - name: Verify Resources
+        run: |
+          echo "===== VERIFY ====="
+          kubectl get deployment
+          kubectl get pods -o wide
           kubectl get svc
+
+      - name: Describe Deployment if Failed
+        if: failure()
+        run: |
+          kubectl describe deployment nginx-demo
+
+      - name: Describe Pods if Failed
+        if: failure()
+        run: |
+          kubectl describe pods
+
+      - name: Show Pod Logs if Failed
+        if: failure()
+        run: |
+          POD=$(kubectl get pods -l app=nginx-demo -o jsonpath='{.items[0].metadata.name}')
+          kubectl logs $POD
