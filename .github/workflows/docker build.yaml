@@ -1,0 +1,37 @@
+name: CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/my-web-app
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Build Information
+        run: |
+          echo "Repository : $GITHUB_REPOSITORY"
+          echo "Commit     : ${GITHUB_SHA::7}"
+          echo "Image      : $IMAGE_NAME"
+
+      - name: Docker Login
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login \
+            -u "${{ secrets.DOCKER_USERNAME }}" \
+            --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t $IMAGE_NAME:${GITHUB_SHA::7} \
+            ./app
+
+      - name: Push Docker Image
+        run: |
+          docker push \
+            $IMAGE_NAME:${GITHUB_SHA::7}
