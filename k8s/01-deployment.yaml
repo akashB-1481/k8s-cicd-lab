@@ -20,7 +20,7 @@ spec:
       containers:
         - name: nginx
 
-          image: nginx:latest
+          image: aakashb1408/my-web-app:v1
 
           ports:
             - containerPort: 80
