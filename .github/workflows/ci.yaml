@@ -23,3 +23,7 @@ jobs:
           docker build \
             -t $IMAGE_NAME:${GITHUB_SHA::7} \
             ./app
+      - name: Push Docker Image
+        run: |
+          docker push \
+            $IMAGE_NAME:${GITHUB_SHA::7}
