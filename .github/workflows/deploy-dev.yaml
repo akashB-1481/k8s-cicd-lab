@@ -6,3 +6,21 @@ on:
       image_tag:
         description: Docker image tag to deploy
         required: true
+env:
+  IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/my-web-app
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Update Deployment Image
+        run: |
+          kubectl set image deployment/nginx-demo \
+            nginx=$IMAGE_NAME:${{ inputs.image_tag }}  # container name which we use in  spec , container ,name i.e nginx
+      - name: Wait for Rollout
+        run: |
+          kubectl rollout status deployment/nginx-demo    
+
