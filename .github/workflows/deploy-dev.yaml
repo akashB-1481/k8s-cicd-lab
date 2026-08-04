@@ -8,7 +8,7 @@ on:
         required: true
 env:
   IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/my-web-app
-
+  KUBECONFIG: /home/ubuntu/.kube/config
 jobs:
   deploy:
     runs-on: self-hosted
@@ -22,5 +22,4 @@ jobs:
             nginx=$IMAGE_NAME:${{ inputs.image_tag }}  # container name which we use in  spec , container ,name i.e nginx
       - name: Wait for Rollout
         run: |
-          kubectl rollout status deployment/nginx-demo    
-
+          kubectl rollout status deployment/nginx-demo
